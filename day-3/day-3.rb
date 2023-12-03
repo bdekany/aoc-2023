@@ -53,41 +53,41 @@ end
 def trouve_etoile(position, taille, tableau, index)
     # On evite les outOfBound
     if position == 0
-        droite = 0
+        gauche = 0
     else
-        droite = position-1
+        gauche = position-1
     end
     if position+taille > tableau[0].length-1
-        gauche = tableau[0].length-1
+        droite = tableau[0].length-1
     else
-        gauche = position+taille
+        droite = position+taille
     end
     
     # Caractères au dessus sauf index=0
     if index != 0
-        ligne = tableau[index-1][droite..gauche]
+        ligne = tableau[index-1][gauche..droite]
         if ligne.index("*")
-            x_pos = position + ligne.index("*")
+            x_pos = position + ligne.index("*") - 1
             y_pos = index-1
         end
     end
 
     # Caratères au dessous sauf index=tableau.length-1
     if index != tableau.length-1
-        ligne = tableau[index+1][droite..gauche]
+        ligne = tableau[index+1][gauche..droite]
         if ligne.index("*")
-            x_pos = position + ligne.index("*")
+            x_pos = position + ligne.index("*") - 1
             y_pos = index+1
         end
     end
 
     # Caractères à droite et gauche
     if tableau[index][droite].index("*")
-        x_pos = tableau[index][droite].index("*")
+        x_pos = droite
         y_pos = index
     end
     if tableau[index][gauche].index("*")
-        x_pos = tableau[index][gauche].index("*")
+        x_pos = gauche
         y_pos = index
     end
 
@@ -115,14 +115,14 @@ tableau.each_with_index do |chaine, index|
         taille = valeur.length
         position = Regexp.last_match.begin(0)
         if trouve_symbole(position, taille, tableau, index)
-            puts "#{valeur} est une piece"
+            # puts "#{valeur} est une piece"
             resultat_part1 += valeur.to_i
         end
 
         x, y = trouve_etoile(position, taille, tableau, index)
         if x != nil && y != nil
             if gps_etoile[[x,y]] != nil
-                puts "#{valeur} est une co-gear"
+                puts "#{valeur} est une co-gear avec #{gps_etoile[[x,y]]}"
                 resultat_part2 += gps_etoile[[x,y]] * valeur.to_i
             else
                 puts "#{valeur} est une gear"

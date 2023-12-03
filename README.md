@@ -4,3 +4,5 @@
 - Python
 ## Day 2
 - nodeJS
+## Day 3
+- Ruby
