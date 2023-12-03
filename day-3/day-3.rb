@@ -51,6 +51,7 @@ end
 ##
 
 def trouve_etoile(position, taille, tableau, index)
+    puts("p:#{position}, t:#{taille}")
     # On evite les outOfBound
     if position == 0
         gauche = 0
@@ -67,7 +68,8 @@ def trouve_etoile(position, taille, tableau, index)
     if index != 0
         ligne = tableau[index-1][gauche..droite]
         if ligne.index("*")
-            x_pos = position + ligne.index("*") - 1
+            #x_pos = position + ligne.index("*") - 1
+            x_pos = gauche + ligne.index("*")
             y_pos = index-1
         end
     end
@@ -76,7 +78,8 @@ def trouve_etoile(position, taille, tableau, index)
     if index != tableau.length-1
         ligne = tableau[index+1][gauche..droite]
         if ligne.index("*")
-            x_pos = position + ligne.index("*") - 1
+            #x_pos = position + ligne.index("*") - 1
+            x_pos = gauche + ligne.index("*")
             y_pos = index+1
         end
     end
@@ -123,9 +126,11 @@ tableau.each_with_index do |chaine, index|
         if x != nil && y != nil
             if gps_etoile[[x,y]] != nil
                 puts "#{valeur} est une co-gear avec #{gps_etoile[[x,y]]}"
+                puts "(#{x}, #{y})"
                 resultat_part2 += gps_etoile[[x,y]] * valeur.to_i
             else
                 puts "#{valeur} est une gear"
+                puts "(#{x}, #{y})"
                 gps_etoile[[x,y]] = valeur.to_i
             end
         end
