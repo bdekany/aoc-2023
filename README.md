@@ -6,3 +6,5 @@
 - nodeJS
 ## Day 3
 - Ruby
+## Day 4
+- JS
