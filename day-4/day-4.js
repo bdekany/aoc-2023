@@ -12,6 +12,8 @@ const filePath = 'puzzle-input.txt';
 // Variable Globale pour les résultats finaux
 let resultat_part1 = 0;
 let resultat_part2 = 0;
+let tableau_part2 = new Array(212).fill(1);
+
 
 // Création d'un objet représentant une carte
 class Carte {
@@ -53,7 +55,7 @@ class Carte {
 // Créer l'interface de lecture
 const readInterface = readline.createInterface({
     input: fs.createReadStream(filePath),
-    output: process.stdout,
+//    output: process.stdout,
     console: false
 });
 
@@ -62,14 +64,27 @@ readInterface.on('line', function(line) {
     let infos_partie = line.split(": ");
 
     // Part 1
-    let numeroCarte = infos_partie[0].split(" ")[1];
+    let numeroCarte = infos_partie[0].match(/\d+/)[0];
     let partieGratage = infos_partie[1];
 
     let carte = new Carte(numeroCarte, partieGratage);
     resultat_part1 += carte.caculValeur()
 
     // Part 2
-    // resultat_part2 += puissancePartie(infos_partie[1]);
+    /* lire carte
+        calcul copies gagnées
+        compteur total += nombre de fois cette carte
+        gain des carte suivantes 
+         mettre a jour compteur
+    */
+    let copiesGagnees = carte.comparerNumeros()
+    resultat_part2 += tableau_part2[carte.numero]
+
+    for ( var i = 1; i <= copiesGagnees.size; i++ ) {
+        copie = carte.numero + i
+        tableau_part2[copie] += tableau_part2[carte.numero]
+        // console.log("carte: " + copie + " = " + tableau_part2[copie])
+    }
 
 });
 
@@ -78,7 +93,7 @@ readInterface.on('close', function() {
     console.log('Lecture du fichier terminée.');
     console.log('===== Resulat Day 2 ======');
     console.log('Part 1: ' + resultat_part1);
-    //console.log('Part 2: ' + resultat_part2);
+    console.log('Part 2: ' + resultat_part2);
 });
 
 
