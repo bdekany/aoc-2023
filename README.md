@@ -12,3 +12,5 @@
 - Python
 ## Day 6
 - Golang
+## Day 7
+- JS
