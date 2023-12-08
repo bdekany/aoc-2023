@@ -7,6 +7,7 @@ import (
 	"regexp"
 )
 
+// Je ne savais pas que map existait en Golang :facepalm:
 func toAscii(chaine string) (int, int, int) {
 	valeurs := [3]int{}
 
@@ -34,6 +35,28 @@ func convertionChemin(chaine string) []int {
 	}
 
 	return tableau
+}
+
+// Trouver sur le /r/adventofcode. Les chemins sont cycliques, donc LCM marche pour part2
+// greatest common divisor (GCD) via Euclidean algorithm
+func GCD(a, b int) int {
+	for b != 0 {
+			t := b
+			b = a % b
+			a = t
+	}
+	return a
+}
+
+// find Least Common Multiple (LCM) via GCD
+func LCM(a, b int, integers ...int) int {
+	result := a * b / GCD(a, b)
+
+	for i := 0; i < len(integers); i++ {
+			result = LCM(result, integers[i])
+	}
+
+	return result
 }
 
 func main() {
@@ -111,7 +134,6 @@ func main() {
 
 	fmt.Println("Part 1 Nombre de Pas :", nombrePas)
 	
-/*
 	// Part2
 	// On reutilise la variable chemin
 	// chemin
@@ -131,31 +153,26 @@ func main() {
 	// Points de depart trouvés
 	fmt.Println(ghostNode)
 
-	nombrePas_part2 := 0
-	// drapeau temoin pour valider l'arrivée 
-	drapeauZ := 0
-	for drapeauZ < len(ghostNode) { // si en début de boucle, drapeauZ est true, on est arrivée
-		// On lit L(0) ou R(1) sur la premier ligne
-		direction := chemin[nombrePas_part2 % len(chemin)]
-		drapeauZ = 0
-		nombrePas_part2++
+	nombrePas_part2 := [6]int{}
 
-		for index, node := range ghostNode {
-			// node actuelle
-			x, y, z := node[0], node[1], node[2]
+	for index, node := range ghostNode {
+		nombrePas_part2[index] = 0
+		x, y, z := node[0], node[1], node[2]
+		for x > -1 { // infini
 			if z == 25 {
-				drapeauZ++
+				// XXZ, tout le monde descend
+				break
 			}
+			// On lit L(0) ou R(1) sur la premier ligne
+			direction := chemin[nombrePas_part2[index] % len(chemin)]
+	
 			prochaineNode := tableauNodes[x][y][z][direction]
-			ghostNode[index] = [3]int{prochaineNode[0], prochaineNode[1], prochaineNode[2]}
+			x, y, z = prochaineNode[0], prochaineNode[1], prochaineNode[2]
+			nombrePas_part2[index]++
+	
 		}
-		if drapeauZ > 2 {
-			fmt.Println(ghostNode, drapeauZ)
-		}
-
 	}
 
-	fmt.Println("Part 2 Nombre de Pas :", nombrePas_part2)
+	fmt.Println("Part 2 Nombre de Pas :", LCM(nombrePas_part2[0], nombrePas_part2[1], nombrePas_part2[2:]...))
 
-*/
 }
