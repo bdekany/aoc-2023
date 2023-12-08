@@ -14,3 +14,5 @@
 - Golang
 ## Day 7
 - JS
+## Day 8
+- Golang
