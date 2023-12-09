@@ -16,3 +16,5 @@
 - JS
 ## Day 8
 - Golang
+## Day 9
+- Python
