@@ -18,3 +18,5 @@
 - Golang
 ## Day 9
 - Python
+## Day 10
+- Rust
