@@ -23,7 +23,7 @@ fn next_pipe(path_loop: &Vec<(usize, usize)>, lines: &Vec<String>) -> Option<(us
 
     let (cur_index, cur_pos) = *courant;
 
-    println!("courant {:#?} {}.", cur_index, cur_pos);
+    // println!("courant {:#?} {}.", cur_index, cur_pos);
     // println!("chemin {:#?}.", chemin);
 
     // Token valides + triche pour S
@@ -35,7 +35,7 @@ fn next_pipe(path_loop: &Vec<(usize, usize)>, lines: &Vec<String>) -> Option<(us
 
     if let Some(c) = lines.get(cur_index)?.chars().nth(cur_pos) {
         // Test Nord
-        println!("tile found {}", c);
+        // println!("tile found {}", c);
         if liste_nord.contains(&c) {
             let position = (cur_index - 1, cur_pos);
             if precedent != &position {
@@ -120,7 +120,42 @@ fn main() -> io::Result<()> {
 
     println!("Part1: Point le plus loin à {}.", result / 2);
 
+    // Part 2
+    // Marquer les cases comme Pipe dans lines, en suivant le chemin trouvé
+    // https://www.reddit.com/r/adventofcode/comments/18fgddy/comment/kcvk2uf/
+    for element in &path_loop {
+        let (index, pos) = *element;
+        if let Some(line) = lines.get_mut(index) {
+            match line.chars().nth(pos) {
+                Some('F'|'7'|'|') => line.replace_range(pos..pos+1, "P"),
+                _ => line.replace_range(pos..pos+1,"N"),
+            }
+        }
+    }
 
+    let mut is_inner :bool;
+
+    let mut in_counter = 0;
+
+    for line in &lines {
+        is_inner = false;
+        for c in line.chars() {
+            match c {
+                'P' => is_inner ^= true,
+                'N' => continue,
+                _ => {
+                    if is_inner == true {
+                        in_counter += 1;
+                    }
+                }
+
+            }
+
+        }
+        // println!("count {}. {}", in_counter, line);
+    }
+
+    println!("Part2: Cas dans le loop {}.", in_counter);
 
     Ok(())
 }
