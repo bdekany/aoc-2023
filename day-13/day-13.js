@@ -14,11 +14,44 @@ let resultat_part2 = 0;
 
 let chateau_de_cartes = new Array()
 
+
 class Carte {
     constructor(n, arr) {
         this.num = n
+        this.chance = -1
+        this.smudge = new Array()
         this.lines = arr
         this.columns = new Array()
+        this.alreadyMirror = false
+    }
+
+    swithTile = (index, i) => {
+        if (this.columns.length > 0) {
+            console.log(this.columns)
+            let line = this.columns[index].split('');
+            line[i] = (line[i] === '#') ? '.' : '#' // Remplace le caractère
+            // Rejoindre le tableau pour reformer une chaîne modifiée
+            this.columns[index] = line.join('')
+        } else {
+            let line = this.lines[index].split('');
+            line[i] = (line[i] === '#') ? '.' : '#' // Remplace le caractère
+            // Rejoindre le tableau pour reformer une chaîne modifiée
+            this.lines[index] = line.join('')
+        }
+    }
+
+    strAlmostEq = (a, b, index) => {
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) {
+                if (this.smudge.length > this.chance) {
+                    return false
+                }
+                this.smudge.push([index, i])
+                console.log("moi", index, i)
+                this.swithTile(index, i)
+            }
+        }
+        return true
     }
 
     linesToCol = () => {
@@ -31,36 +64,43 @@ class Carte {
     }
 
     symetry = (arr) => {
-        /* step de i, comapre a i+1
-         > vrai, pivot = i, true
-           compare pivot - 1  +2 
-            > si vrai ; ou i =0 ; ou j > len carte
-            > pivpt = answer
-            > si faux break
-         > faux ; test de i+1
-        */
-
        let pivot = 0
     
        for (let index = 0 ; index < arr.length - 1 ; index++ ) {
             console.log("compare: " + index + " " + arr[index] + " > " + arr[index+1])
-            if ( arr[index] === arr[index+1] ) { // On trouve une potentielle ligne de symetrie
+            if ( this.strAlmostEq(arr[index], arr[index+1], index) ) { // On trouve une potentielle ligne de symetrie
                 pivot = index                    // On stock l'index comme pivot
                 console.log("pivot potentiel " + pivot)
                 let i = pivot - 1
                 let j = pivot + 2
                 if ( i < 0 || j > arr.length - 1 ) {
+                    if (this.smudge.length == 0) {
+                        continue
+                    }
+                    console.log(this.num + " gagne : " + pivot)
+                    this.alreadyMirror = true
                     return pivot + 1
                 }
-                while ( arr[i] === arr[j] ) {   // on compare en partant du pivot
+                while ( this.strAlmostEq(arr[i], arr[j], i) ) {   // on compare en partant du pivot
                     console.log("check: " + i + ":" + j + " " + arr[i] + " > " + arr[j])
                     if ( i == 0 || j == arr.length - 1 ) { // Si on arrive à un bout de tablea, c'est gagné
+                        if (this.smudge.length == 0) {
+                            break
+                        }
                         console.log(this.num + " gagne : " + pivot)
+                        this.alreadyMirror = true
                         return pivot + 1
                     }
                     i--
                     j++
                 }
+
+
+            }
+            // reset smudge
+            if(this.smudge.length > 0) {
+                this.swithTile(this.smudge[0][0], this.smudge[0][1])
+                this.smudge.pop()
             }
        }
 
@@ -73,6 +113,9 @@ class Carte {
     }
 
     colMirror = () => {
+       if (this.alreadyMirror) {
+            return 0
+        }
         this.linesToCol()
         return this.symetry(this.columns);
     }
@@ -105,12 +148,22 @@ readInterface.on('line', function(line) {
 // Gestion de la fin de fichier
 readInterface.on('close', function() {
     
-
+/*
     resultat_part1 = chateau_de_cartes.map((carte) => carte.rowMirror())
                     .reduce((acc, valeur) => acc + valeur, 0)
     resultat_part1 *= 100
     resultat_part1 += chateau_de_cartes.map((carte) => carte.colMirror())
     .reduce((acc, valeur) => acc + valeur, 0)
+*/
+   resultat_part2 = chateau_de_cartes.map((carte) => {
+        carte.chance = 0
+        return carte.rowMirror()
+    }).reduce((acc, valeur) => acc + valeur, 0)
+    resultat_part2 *= 100
+    resultat_part2 += chateau_de_cartes.map((carte) => {
+        carte.chance = 0
+        return carte.colMirror()
+    }).reduce((acc, valeur) => acc + valeur, 0)
 
     console.log('Lecture du fichier terminée.');
     console.log(chateau_de_cartes.length)
