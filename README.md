@@ -26,3 +26,5 @@
 - Go
 ## Day 13
 - JS
+## Day 14
+- Python
