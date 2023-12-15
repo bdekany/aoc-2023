@@ -26,6 +26,14 @@ def bubbleSort(array):
                 array[j] = array[j+1]
                 array[j+1] = temp
 
+def weight_array_part2(array):
+    total_weight = 0
+    for i, row in enumerate(array):
+        for j, val in enumerate(row):
+            if val == 'O':
+                total_weight += len(array) - i
+    
+    return total_weight
 
 def weight_array(array):
     total_weight = 0
@@ -39,11 +47,19 @@ def weight_array(array):
 def one_tilt(arr):
      return [list(line)[::-1] for line in zip(*arr)]
 
+def hash_list(arr):
+    # from [][] to str
+    return ''.join(list(map(lambda x: ''.join(x), arr)))
+
 carte = list()
-carte_sorted = list()
 resulat_puzzle = 0
 
+# Cache system to avoid bubbleSort
 temoin = dict()
+
+# Detection de Cycle
+carte_sorted = dict()
+loads_part2 = dict()
 
 # Ouvre le fichier en mode lecture
 nom_fichier = 'puzzle-input.txt'
@@ -54,9 +70,9 @@ with open(nom_fichier, 'r') as fichier:
         carte.append(ligne.strip())
 
 # First
-for c in range(0, 16):
+for c in range(0, 1000000000):
     for t in range(0, 4):
-        print('===== tilt %d ======' % t)
+        #print('===== tilt %d ======' % t)
         carte = one_tilt(carte) # Transpo colones en lignes
         
         for i, row in enumerate(carte):
@@ -70,18 +86,20 @@ for c in range(0, 16):
 
         if t == 0 and c == 0: # Part 1
             resulat_puzzle = weight_array(carte)
-    #pprint.pprint(carte)
-    pprint.pprint(weight_array(carte))
+    
+    carte_hash = hash_list(carte)
+    if carte_hash in carte_sorted: # Detect cycle pattern
+        break
+    else:
+        carte_sorted[carte_hash] = c + 1 # Store new pattern
+        loads_part2[c + 1] = weight_array_part2(carte)
+    print("cycle %d : %d" % (c, len(carte_sorted)))
 
 
-
-resulat_puzzle_part2 = weight_array(carte)
-
-
-
-#for i in range(0, len(carte_sorted)):
-#    print('---')
-#    resulat_puzzle += bubbleSort(carte_sorted[i])
+## Solve 
+cycle = c + 1
+loads_index = (( 1000000000 - carte_sorted[carte_hash]) % (c - carte_sorted[carte_hash])) + carte_sorted[carte_hash]
+resulat_puzzle_part2 = loads_part2[loads_index]
 
 
 print("===== Réponse du day-1 =====")
