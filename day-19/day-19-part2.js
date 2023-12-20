@@ -5,46 +5,65 @@
 const fs = require('fs');
 const readline = require('readline');
 
-applyWorkflow = (wf, partNum) => {
+applyWorkflow = (wf, partNum, logique, i = 0) => {
     let rules = workflows.get(wf).split(",")
     // console.log(rules);
 
-    for (let r of rules) {
-
+    for ( ; i < rules.length ; i++) {
+        r = rules[i]
+        logique += r + ";"
         let groups = r.match(/([xmas])([<>])([0-9]+):([a-zA-Z]+)/)
 
         if ( groups !== null ) {
-            // console.log("in solve ", groups);
             let val = groups[1]
             let operator = groups[2]
             let thresold = parseInt(groups[3])
             let target = groups[4]
 
-            if ( operator === "<" && partNum.get(val) < thresold ) {
-                r = target
+            // Object for new path
+            let newPart = new Map(partNum)
+            let [bot, top] = partNum.get(val)
+            
+            if ( operator === "<" ) {
+                newPart.set(val, [thresold, top])
+                //console.log("new", newPart)
+                
+                partNum.set(val, [bot, thresold - 1])
+                //console.log("old", partNum)
             }
 
-            if ( operator === ">" && partNum.get(val) > thresold ) {
-                r = target
+            if ( operator === ">" ) {
+                newPart.set(val, [bot, thresold])
+                //console.log("new", newPart)
+
+                partNum.set(val, [thresold + 1, top])
+                //console.log("old", partNum)
             }
 
-            // console.log("r est ", r);
+            applyWorkflow(wf, newPart, logique, i+1) // Explore new path and next rule (i+1)
+            r = target // continue the path
 
         }
 
         if ( r === "A" ) {
-            resultat_part1 += partNum.get('x') + partNum.get('m') + partNum.get('a') + partNum.get('s')
+            let result = 1
+            console.log("win ", logique, partNum)
+            for (let [k, v] of partNum) {
+                result *= v[1] - v[0] + 1
+            }
+            resultat_part2 += result
             break 
         }
 
         if ( r === "R" ) {
+            // console.log("lose", logique, partNum)
             // Reject
             break 
         }
 
         if ( r.match(/^[a-z]+$/) ) {
             // console.log("go ", r);
-            applyWorkflow(r, partNum)
+            applyWorkflow(r, partNum, logique)
             break
         }
 
@@ -83,7 +102,7 @@ readInterface.on('line', function(line) {
         workflows.set(wfName, wfRule)
 
     }
-    else {
+    /* else {
         // console.log("object");
         let part = line.match(partRegex)
         let partNum = new Map()
@@ -94,15 +113,20 @@ readInterface.on('line', function(line) {
 
         applyWorkflow('in', partNum)
 
-    }
+    } */
 });
 
 // Gestion de la fin de fichier
 readInterface.on('close', function() {
- 
+    let partNum = new Map()
+    partNum.set('x', [1, 4000])
+    partNum.set('m', [1, 4000])
+    partNum.set('a', [1, 4000])
+    partNum.set('s', [1, 4000])
+    applyWorkflow('in', partNum, "")
     console.log('===== Resulat Day 19 ======');
-    console.log('Part 1: ' + resultat_part1);
-    //console.log('Part 2: ' + resultat_part2);
+    //console.log('Part 1: ' + resultat_part1);
+    console.log('Part 2: ' + resultat_part2);
 });
 
 
