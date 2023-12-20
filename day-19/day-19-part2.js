@@ -5,88 +5,65 @@
 const fs = require('fs');
 const readline = require('readline');
 
-applyWorkflow = (wf, partNum, i = 0) => {
-    console.log("pattern ", wf, " iter ", i)
-    console.log(workflows.get(wf))
+applyWorkflow = (wf, partNum, logique, i = 0) => {
     let rules = workflows.get(wf).split(",")
     // console.log(rules);
 
     for ( ; i < rules.length ; i++) {
         r = rules[i]
+        logique += r + ";"
         let groups = r.match(/([xmas])([<>])([0-9]+):([a-zA-Z]+)/)
 
         if ( groups !== null ) {
-            // console.log("in solve ", groups);
             let val = groups[1]
             let operator = groups[2]
             let thresold = parseInt(groups[3])
             let target = groups[4]
 
+            // Object for new path
+            let newPart = new Map(partNum)
+            let [bot, top] = partNum.get(val)
+            
             if ( operator === "<" ) {
-                // Object for new path
-                let newPart = new Map(partNum)
-                let [bot, top] = partNum.get(val)
-
-                console.log(bot, thresold, top);
-                if ( bot < thresold && thresold < top ) {
-                    newPart.set(val, [thresold, top])
-                    //console.log("new", newPart)
-                    applyWorkflow(wf, newPart, i+1)
-                }
+                newPart.set(val, [thresold, top])
+                //console.log("new", newPart)
                 
-                if (bot > thresold - 1 || thresold - 1 > top ) {
-                    continue
-                }
-
-                partNum.set(val, [thresold - 1, top])
+                partNum.set(val, [bot, thresold - 1])
                 //console.log("old", partNum)
-                r = target
             }
 
             if ( operator === ">" ) {
-                // Object for new path
-                let newPart = new Map(partNum)
-                let [bot, top] = partNum.get(val)
+                newPart.set(val, [bot, thresold])
+                //console.log("new", newPart)
 
-                console.log(bot, thresold, top);
-                if ( top > thresold && thresold > bot ) {
-                    newPart.set(val, [bot, thresold])
-                    //console.log("new", newPart)
-                    applyWorkflow(wf, newPart, i+1)
-                }
-                
-                if (bot > thresold - 1 || thresold - 1 > top) {
-                    continue
-                }
-
-                partNum.set(val, [bot, thresold + 1])
+                partNum.set(val, [thresold + 1, top])
                 //console.log("old", partNum)
-                r = target
             }
 
-            // console.log("r est ", r);
+            applyWorkflow(wf, newPart, logique, i+1) // Explore new path and next rule (i+1)
+            r = target // continue the path
 
         }
 
         if ( r === "A" ) {
             let result = 1
-            console.log("win ", partNum)
+            console.log("win ", logique, partNum)
             for (let [k, v] of partNum) {
-                result *= v[1] - v[0]
+                result *= v[1] - v[0] + 1
             }
             resultat_part2 += result
             break 
         }
 
         if ( r === "R" ) {
-            //console.log("lose", partNum)
+            // console.log("lose", logique, partNum)
             // Reject
             break 
         }
 
         if ( r.match(/^[a-z]+$/) ) {
             // console.log("go ", r);
-            applyWorkflow(r, partNum)
+            applyWorkflow(r, partNum, logique)
             break
         }
 
@@ -95,7 +72,7 @@ applyWorkflow = (wf, partNum, i = 0) => {
 }
 
 // Chemin vers ton fichier
-const filePath = 'puzzle-input.test';
+const filePath = 'puzzle-input.txt';
 
 // Variable Globale pour les résultats finaux
 let resultat_part1 = 0;
@@ -146,7 +123,7 @@ readInterface.on('close', function() {
     partNum.set('m', [1, 4000])
     partNum.set('a', [1, 4000])
     partNum.set('s', [1, 4000])
-    applyWorkflow('in', partNum)
+    applyWorkflow('in', partNum, "")
     console.log('===== Resulat Day 19 ======');
     //console.log('Part 1: ' + resultat_part1);
     console.log('Part 2: ' + resultat_part2);
