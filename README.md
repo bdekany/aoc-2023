@@ -36,3 +36,5 @@
 - JS
 ## Day 20
 - Golang
+## Day 21
+- Rust
