@@ -34,3 +34,5 @@
 - Python
 ## Day 19
 - JS
+## Day 20
+- Golang
