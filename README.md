@@ -38,3 +38,5 @@
 - Golang
 ## Day 21
 - Rust
+## Day 23
+- Python
