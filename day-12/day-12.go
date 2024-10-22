@@ -92,11 +92,17 @@ func genPattern(currentPattern, degradedMotif string, badOnsens []string) int {
 		if compareMotif(onsen, degradedMotif[index:index+len(onsen)]) {
 
 			if len(badOnsens[1:]) == 0 {
-				fmt.Println("Full Pattern")
-				possible +=1
+				// Est-ce qu'il y a encore des # dans le motif dégradé?
+				pos := strings.Index(degradedMotif[index+len(onsen):], "#")
+				if pos < 0 {
+					fmt.Println("Full Pattern: found")
+					fmt.Println(degradedMotif)
+					fmt.Println(currentPattern + onsen)
+					possible +=1
+				}
 			} else {
 				var nextPattern = currentPattern + onsen
-				fmt.Println("Next Deep", nextPattern, degradedMotif, badOnsens[1:])
+				//fmt.Println("Next Deep", nextPattern, degradedMotif, badOnsens[1:])
 				possible += genPattern(nextPattern, degradedMotif, badOnsens[1:])
 			}
 
@@ -104,7 +110,7 @@ func genPattern(currentPattern, degradedMotif string, badOnsens []string) int {
 		
 		// tenter la prochaine iteration
 		onsen = "." + onsen
-		fmt.Println("Next Loop", onsen)
+		//fmt.Println("Next Loop", onsen)
 	}
 
 	return possible
